@@ -1,0 +1,27 @@
+{
+  "name": "@puerts/shell-util",
+  "version": "1.0.3",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "tsc -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puerts/shell-util.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/puerts/shell-util/issues"
+  },
+  "homepage": "https://github.com/puerts/shell-util#readme",
+  "dependencies": {
+    "@types/iconv-lite": "^0.0.1",
+    "@types/node": "^18.7.12",
+    "@types/shelljs": "^0.8.11",
+    "glob": "^8.0.3",
+    "shelljs": "^0.8.5",
+    "typescript": "^4.7.4"
+  }
+}

@@ -1,0 +1,57 @@
+import * as ts from "typescript";
+import { cd, cp, ls, mkdir, mv, pwd, touch, exec as sxExec } from "shelljs";
+import { chmod } from "fs";
+import { decode } from "iconv-lite";
+
+function compileTypescriptProject(tsConfigPath: string) {
+    var result: ts.ParsedCommandLine | undefined = ts.getParsedCommandLineOfConfigFile(
+        tsConfigPath,
+        void 0,
+        Object.assign({
+            onUnRecoverableConfigFileDiagnostic: (d: ts.Diagnostic) => d
+        }, ts.sys),
+        void 0,
+        void 0
+    );
+    if (!result) {
+        throw new Error('parse tsconfig.json failed');
+    }
+
+    const program = ts.createProgram(result.fileNames, result.options);
+    const emitResult = program.emit();
+
+    ts.getPreEmitDiagnostics(program)
+        .concat(emitResult.diagnostics)
+        .forEach((diagnostic: ts.Diagnostic) => {
+            if (diagnostic.file) {
+                let { line, character } = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start!);
+
+                let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+                console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
+            } else {
+                console.log(ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"));
+            }
+        });
+}
+
+export { compileTypescriptProject }
+export { mv, mkdir, cp, cd, chmod, ls, pwd, touch }
+
+export function exec(command: string) {
+
+    return new Promise((resolve, reject) => {
+        let child = sxExec(command, {
+            async: true,
+            silent: true,
+            encoding: 'binary'
+        }, code => {
+            code ? reject(code) : resolve(code);
+        });
+        child.stdout && child.stdout.on('data', function (data) {
+            console.log(decode(Buffer.from(data, 'binary'), process.platform == 'win32' ? "gb2312" : 'utf-8'));
+        })
+        child.stderr && child.stderr.on('data', function (data) {
+            console.error(decode(Buffer.from(data, 'binary'), process.platform == 'win32' ? "gb2312" : 'utf-8'));
+        })
+    })
+}
