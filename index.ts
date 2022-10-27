@@ -1,7 +1,6 @@
 import * as ts from "typescript";
-import { cd, cp, ls, mkdir, mv, pwd, touch, exec as sxExec } from "shelljs";
+import { cd, cp, ls, mkdir, mv, pwd, touch, exec, rm } from "shelljs";
 import { chmod } from "fs";
-import { decode } from "iconv-lite";
 
 function compileTypescriptProject(tsConfigPath: string) {
     var result: ts.ParsedCommandLine | undefined = ts.getParsedCommandLineOfConfigFile(
@@ -35,23 +34,10 @@ function compileTypescriptProject(tsConfigPath: string) {
 }
 
 export { compileTypescriptProject }
-export { mv, mkdir, cp, cd, chmod, ls, pwd, touch }
+export { mv, mkdir, cp, cd, chmod, ls, pwd, touch, rm, exec }
 
-export function exec(command: string) {
-
-    return new Promise((resolve, reject) => {
-        let child = sxExec(command, {
-            async: true,
-            silent: true,
-            encoding: 'binary'
-        }, code => {
-            code ? reject(code) : resolve(code);
-        });
-        child.stdout && child.stdout.on('data', function (data) {
-            console.log(decode(Buffer.from(data, 'binary'), process.platform == 'win32' ? "gb2312" : 'utf-8'));
-        })
-        child.stderr && child.stderr.on('data', function (data) {
-            console.error(decode(Buffer.from(data, 'binary'), process.platform == 'win32' ? "gb2312" : 'utf-8'));
-        })
-    })
+export function setWinCMDEncodingToUTF8() {
+    if (process.platform == 'win32') {
+        exec(`CHCP 65001`, { silent: true });
+    }
 }

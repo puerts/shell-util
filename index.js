@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.exec = exports.touch = exports.pwd = exports.ls = exports.chmod = exports.cd = exports.cp = exports.mkdir = exports.mv = exports.compileTypescriptProject = void 0;
+exports.setWinCMDEncodingToUTF8 = exports.exec = exports.rm = exports.touch = exports.pwd = exports.ls = exports.chmod = exports.cd = exports.cp = exports.mkdir = exports.mv = exports.compileTypescriptProject = void 0;
 const ts = __importStar(require("typescript"));
 const shelljs_1 = require("shelljs");
 Object.defineProperty(exports, "cd", { enumerable: true, get: function () { return shelljs_1.cd; } });
@@ -33,9 +33,10 @@ Object.defineProperty(exports, "mkdir", { enumerable: true, get: function () { r
 Object.defineProperty(exports, "mv", { enumerable: true, get: function () { return shelljs_1.mv; } });
 Object.defineProperty(exports, "pwd", { enumerable: true, get: function () { return shelljs_1.pwd; } });
 Object.defineProperty(exports, "touch", { enumerable: true, get: function () { return shelljs_1.touch; } });
+Object.defineProperty(exports, "exec", { enumerable: true, get: function () { return shelljs_1.exec; } });
+Object.defineProperty(exports, "rm", { enumerable: true, get: function () { return shelljs_1.rm; } });
 const fs_1 = require("fs");
 Object.defineProperty(exports, "chmod", { enumerable: true, get: function () { return fs_1.chmod; } });
-const iconv_lite_1 = require("iconv-lite");
 function compileTypescriptProject(tsConfigPath) {
     var result = ts.getParsedCommandLineOfConfigFile(tsConfigPath, void 0, Object.assign({
         onUnRecoverableConfigFileDiagnostic: (d) => d
@@ -59,21 +60,9 @@ function compileTypescriptProject(tsConfigPath) {
     });
 }
 exports.compileTypescriptProject = compileTypescriptProject;
-function exec(command) {
-    return new Promise((resolve, reject) => {
-        let child = (0, shelljs_1.exec)(command, {
-            async: true,
-            silent: true,
-            encoding: 'binary'
-        }, code => {
-            code ? reject(code) : resolve(code);
-        });
-        child.stdout && child.stdout.on('data', function (data) {
-            console.log((0, iconv_lite_1.decode)(Buffer.from(data, 'binary'), process.platform == 'win32' ? "gb2312" : 'utf-8'));
-        });
-        child.stderr && child.stderr.on('data', function (data) {
-            console.error((0, iconv_lite_1.decode)(Buffer.from(data, 'binary'), process.platform == 'win32' ? "gb2312" : 'utf-8'));
-        });
-    });
+function setWinCMDEncodingToUTF8() {
+    if (process.platform == 'win32') {
+        (0, shelljs_1.exec)(`CHCP 65001`, { silent: true });
+    }
 }
-exports.exec = exec;
+exports.setWinCMDEncodingToUTF8 = setWinCMDEncodingToUTF8;
