@@ -33,7 +33,6 @@ Object.defineProperty(exports, "mkdir", { enumerable: true, get: function () { r
 Object.defineProperty(exports, "mv", { enumerable: true, get: function () { return shelljs_1.mv; } });
 Object.defineProperty(exports, "pwd", { enumerable: true, get: function () { return shelljs_1.pwd; } });
 Object.defineProperty(exports, "touch", { enumerable: true, get: function () { return shelljs_1.touch; } });
-Object.defineProperty(exports, "exec", { enumerable: true, get: function () { return shelljs_1.exec; } });
 Object.defineProperty(exports, "rm", { enumerable: true, get: function () { return shelljs_1.rm; } });
 const fs_1 = require("fs");
 Object.defineProperty(exports, "chmod", { enumerable: true, get: function () { return fs_1.chmod; } });
@@ -60,9 +59,15 @@ function compileTypescriptProject(tsConfigPath) {
     });
 }
 exports.compileTypescriptProject = compileTypescriptProject;
+const exec = function () {
+    console.log(arguments[0]);
+    //@ts-ignore
+    return shelljs_1.exec.apply(null, arguments);
+};
+exports.exec = exec;
 function setWinCMDEncodingToUTF8() {
     if (process.platform == 'win32') {
-        (0, shelljs_1.exec)(`CHCP 65001`, { silent: true });
+        exec(`CHCP 65001`, { silent: true });
     }
 }
 exports.setWinCMDEncodingToUTF8 = setWinCMDEncodingToUTF8;

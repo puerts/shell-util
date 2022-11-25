@@ -1,5 +1,5 @@
 import * as ts from "typescript";
-import { cd, cp, ls, mkdir, mv, pwd, touch, exec, rm } from "shelljs";
+import { cd, cp, ls, mkdir, mv, pwd, touch, exec as sxExec, rm, ExecFunction } from "shelljs";
 import { chmod } from "fs";
 
 function compileTypescriptProject(tsConfigPath: string) {
@@ -32,6 +32,12 @@ function compileTypescriptProject(tsConfigPath: string) {
             }
         });
 }
+
+const exec: ExecFunction = function() {
+    console.log(arguments[0]);
+    //@ts-ignore
+    return sxExec.apply(null, arguments);
+} as any
 
 export { compileTypescriptProject }
 export { mv, mkdir, cp, cd, chmod, ls, pwd, touch, rm, exec }
